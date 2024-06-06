@@ -35,7 +35,7 @@ export XDG_CACHE_HOME="$HOME/.cache"
 mkdir ocp
 cd /ocp/
 SSH_KEY_DATA=$( cat /root/.ssh/id_ed25519.pub )
-SSH_KEY=                            # provide .pub key here
+SSH_KEY= $SSH_KEY_DATA
 PULLSECRET=                         # paste pullsecret key
 AWS_ACCESS_KEY=                     # paste AWS_ACCESS_KEY
 AWS_SECRET_ACCESSKEY=               # AWS_SECRET_ACCESSKEY

@@ -1,0 +1,282 @@
+One domain name and one Linux/Mac machine are required to deploy the Cluster (I’m using Ubuntu; if you don’t use Ubuntu, the script won’t function.).
+
+I am using Terraform to deploy the OCP Deployment machine and OCP Cluster.
+
+I purchased a domain name on the Namecheap website. You can buy it on any website. |||    outoftheboxmine.online
+
+The OpenShift Cluster Pull Secret is required and can be downloaded from the Redhat OpenShift official website –
+https://console.redhat.com/openshift/install/aws/installer-provisioned   ---- To download Pull secret
+https://console.redhat.com/openshift/install/pull-secret
+
+OpenShift is a Red Hat Enterprise product. A license is required to deploy OpenShift Cluster. There is a 60-day trial available; you can try it even if you do not have a license.
+
+
+
+------------------------------
+Install Terraform on your local machine. ||| Ubuntu machine is required ||||
+
+To install Terraform, follow the official page link provided below.
+
+https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+
+-==============================================================================================
+
+Install Git and Clone below the repo.
+https://github.com/ckmine11/openshift-aws.git
+----------------------------------------------------
+
+After cloning, switch to the directory.
+-----------------------------------------------------------------------------------------------------
+In the Main.tf file, update the AWS region name.
+-----------------------------------------------------------------------------------------------------
+
+provider "aws" {
+    access_key = "${var.access_key}"
+    secret_key = "${var.secret_key}"
+    region = "ap-south-1"
+}
+
+resource "aws_instance" "ec2_instance" {
+  ami = "${var.ami_id}"
+  count = "${var.number_of_instances}"
+  subnet_id = "${var.subnet_id}"
+  instance_type = "${var.instance_type}"
+  key_name = "${var.ami_key_pair_name}"
+  user_data = "${file("ocp.sh")}"                      
+  tags = {
+  Name = "ocp_deployment"
+  }
+} 
+
+
+
+---------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+In the variables.tf file update parameters based on your infra (OCP deployment machine configuration. NOTE: Use an Ubuntu-only deployment machine; otherwise, the below script fails.)
+
+------------------------------------------------------------------------------------------------------
+
+variable "access_key" {
+        description = "Access key to AWS console"
+        default = "Enter AWS access_key"            # enter your access key and secret key
+}
+variable "secret_key" {
+        description = "Secret key to AWS console"
+        sensitive   = true
+}
+
+variable "instance_type" {
+        default = "t2.medium"
+}
+
+variable "subnet_id" {
+        description = "The VPC subnet the instance(s) will be created in"
+        default = "subnet-075549e275a0b1613"        # change subnet
+}
+
+variable "ami_id" {
+        description = "The AMI to use"
+        default = "ami-03f4878755434977f"          # change the AMI id
+}
+
+variable "number_of_instances" {
+        description = "number of instances to be created"
+        default = 1
+}
+
+
+variable "ami_key_pair_name" {
+        default = "test_key"                # create key in aws and change the key
+}
+
+
+
+----------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
+In the OCP.sh file, update the following line (OpenShift Cluster. Configuration): –
+
+-----------------------------------------------------------------------------------------
+#!/bin/bash
+#Maintainer Chandan kumar outoftheboxmine.online
+OPENSHIFT_VERSION=4.14                            # Enter OpenShift Version -4.12/4.13/4.14
+BASE_DOMAIN=outoftheboxmine.online                      # Enter Base Domain Name 
+CLUSTER_NAME=openshift                            # Cluster Name
+AWS_REGION=ap-south-1                             # Enter AWS Region name ,In which region you want to deploy 
+AWS_ZONE1=ap-south-1a                             # Enter AWS Zone name        
+AWS_ZONE2=ap-south-1b                             # Enter AWS Zone2 name
+CONREOLPLANE_NODE_FLAVOR=m6i.xlarge
+WORKER_NODE_FLAVOR=m6i.xlarge
+NUMBER_OF_WORKER_NODES=3                          # Number of Worker Nodes
+NETWORK_TYPE=OVNKubernetes                        # OVNKubenetes or openshiftSDN
+CLUSTER_NETWORK_CIDR=10.128.0.0/14
+MACHINE_NETWORK_CIDR=10.0.0.0/16
+SERVICE_NETWORK_CIDR=172.30.0.0/16
+#---------------------------------------------------------------------------------------------------------------
+#PULLSECRET_KEY=                                         # Convert and paste pullsecret key in base64 Format 
+#AWS_ACCESS_KEY_DATA=                                    # Convert and paste AWS ACCESS  key in base64 Format
+#AWS_SECRET_ACCESSKEY_DATA=                              # Convert and paste AWS SECRET  key in base64 Format 
+#---------------------------------------------------------------------------------------------------------------
+
+#OpenShift Deployment Configuration 
+
+ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+apt install curl unzip -y 
+curl "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-$OPENSHIFT_VERSION/openshift-install-linux.tar.gz" | tar xz -C /tmp
+mv /tmp/openshift-install /usr/bin
+curl "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-$OPENSHIFT_VERSION/openshift-client-linux.tar.gz" | tar xz -C /tmp
+mv /tmp/oc /usr/bin
+mv /tmp/kubectl /usr/bin
+mkdir -p $HOME/.cache
+export XDG_CACHE_HOME="$HOME/.cache"
+mkdir ocp
+cd /ocp/
+SSH_KEY_DATA=$( cat /root/.ssh/id_ed25519.pub )
+SSH_KEY=                            # provide .pub key here
+PULLSECRET=                         # paste pullsecret key
+AWS_ACCESS_KEY=                     # paste AWS_ACCESS_KEY
+AWS_SECRET_ACCESSKEY=               # AWS_SECRET_ACCESSKEY
+#---------------------------------------------------------------------------------------------------------------------
+#SSH_KEY=$(echo "${SSH_KEY_DATA}" | awk -F '"' '{print $1}')     # provide .pub key here
+#PULLSECRET=$(echo "${PULLSECRET_KEY}" | awk -F '"' '{print $1}' | base64 --decode )   # paste pullsecret key
+#AWS_ACCESS_KEY=$(echo "${AWS_ACCESS_KEY_DATA}" | awk -F '"' '{print $1}' | base64 --decode ) # paste AWS_ACCESS_KEY
+#AWS_SECRET_ACCESSKEY=$(echo "${AWS_SECRET_ACCESSKEY_DATA}" | awk -F '"' '{print $1}' | base64 --decode ) # AWS_SECRET_ACCESSKEY
+#----------------------------------------------------------------------------------------------------------------------------
+
+mkdir ~/.aws
+cat<< EOF > ~/.aws/credentials
+[default] 
+aws_access_key_id= $AWS_ACCESS_KEY
+aws_secret_access_key=$AWS_SECRET_ACCESSKEY
+EOF
+
+cat << EOF > install-config.yaml
+apiVersion: v1
+baseDomain: $BASE_DOMAIN
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  platform:
+    aws:
+      zones:
+      - $AWS_ZONE1
+      - $AWS_ZONE2
+      rootVolume:
+        iops: 4000
+        size: 500
+        type: io1
+      type: $CONREOLPLANE_NODE_FLAVOR
+  replicas: 3
+compute:
+- hyperthreading: Enabled
+  name: worker
+  platform:
+    aws:
+      rootVolume:
+        iops: 2000
+        size: 500
+        type: io1
+      type: $WORKER_NODE_FLAVOR
+      zones:
+      - $AWS_ZONE1
+      - $AWS_ZONE2
+  replicas: $NUMBER_OF_WORKER_NODES
+metadata:
+  name: $CLUSTER_NAME
+networking:
+  clusterNetwork:
+  - cidr: $CLUSTER_NETWORK_CIDR
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: $MACHINE_NETWORK_CIDR
+  networkType: $NETWORK_TYPE
+  serviceNetwork:
+  - $SERVICE_NETWORK_CIDR
+platform:
+  aws:
+    region: $AWS_REGION
+fips: false
+sshKey: $SSH_KEY
+pullSecret: '$PULLSECRET'
+EOF
+sudo openshift-install create cluster --log-level=info
+
+-------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
+Next Start Deployment
+
+Run the below command to initializes a working directory and download the necessary provider plugins and modules.
+
+$ terraform init
+
+Run terraform plan – The terraform plan command creates an execution plan, which lets you preview the changes that Terraform plans to make to your infrastructure.
+
+$terraform plan
+
+Next, run the final command terraform apply.
+
+$ terraform apply -auto-approve
+
+
+# secret key popup so provide a secret key and enter
+Enter the AWS Secret Key. Press Enter.
+
+Deployment stated.
+
+Once the Deployment instance is ready. OCP deployment will start automatically.
+
+ou can access the instance using PUBLIC IP. Make sure that in the security group, ssh port 22 is allowed to access the machine
+
+$ ssh -i /path/key-pair.pem ubuntu@my-instance-public IP/DNS
+
+
+You are allowed to relax. The OpenShift Cluster deployment will take some time.
+
+Openshift will automatically provision AWS Master, worker nodes, volumes, security groups, networks, internal and external load balancers, and so on.
+
+You can check deployment logs using the below command.
+
+$ tail -f /var/log/cloud-init-output.log
+
+
+One Temporary bootstrap instance will be created by Openshift. Temporary boot strap instance will be terminated once cluster nodes are ready.
+
+
+You can also check the node status.
+
+Cluster files are storage in the ocp directory
+
+$ export KUBECONFIG=/ocp/auth/kubeconfig
+
+$kubectl get nodes
+
+
+Permit necessary ports in the Security group and gain access to the OpenShift URL.
+
+You can find the URL, Username and Password in the logs (tail -n 25 /var/log/cloud-init-output.log)
+
+Or you can run the below commands to get the URL
+
+$ oc get routes –all-namespaces | grep -i console-openshift or $kubectl get routes –all-namespaces | grep -i console-openshift
+
+By default, Username – kubeadmin
+
+Password – you can find it in the Logs, and You can see it in the ocp/auth / directory
+
+
+If you want to destroy an Openshift Cluster, run the below command in the OCP Deployment machine.
+
+Switch to ocp directory.
+
+$ openshift-install destroy cluster
+
+
+To destroy the instance of OCP Deployment
+
+To destroy an instance, run the following command on your local system.
+
+$ terraform destroy
+
+
+===================================================================================================================================

@@ -1,7 +1,7 @@
 #!/bin/bash
-#Maintainer DineshReddy Kayithi kdinesh.in
+#Maintainer Chandan kumar outoftheboxmine.online
 OPENSHIFT_VERSION=4.14                            # Enter OpenShift Version -4.12/4.13/4.14
-BASE_DOMAIN=dineshreddyk.com                      # Enter Base Domain Name 
+BASE_DOMAIN=outoftheboxmine.online                      # Enter Base Domain Name 
 CLUSTER_NAME=openshift                            # Cluster Name
 AWS_REGION=ap-south-1                             # Enter AWS Region name ,In which region you want to deploy 
 AWS_ZONE1=ap-south-1a                             # Enter AWS Zone name        
@@ -13,9 +13,11 @@ NETWORK_TYPE=OVNKubernetes                        # OVNKubenetes or openshiftSDN
 CLUSTER_NETWORK_CIDR=10.128.0.0/14
 MACHINE_NETWORK_CIDR=10.0.0.0/16
 SERVICE_NETWORK_CIDR=172.30.0.0/16
-PULLSECRET_KEY=                                    # Convert and paste pullsecret key in base64 Format 
-AWS_ACCESS_KEY_DATA=                                    # Convert and paste AWS ACCESS  key in base64 Format
-AWS_SECRET_ACCESSKEY_DATA=                              # Convert and paste AWS SECRET  key in base64 Format 
+#---------------------------------------------------------------------------------------------------------------
+#PULLSECRET_KEY=                                         # Convert and paste pullsecret key in base64 Format 
+#AWS_ACCESS_KEY_DATA=                                    # Convert and paste AWS ACCESS  key in base64 Format
+#AWS_SECRET_ACCESSKEY_DATA=                              # Convert and paste AWS SECRET  key in base64 Format 
+#---------------------------------------------------------------------------------------------------------------
 
 #OpenShift Deployment Configuration 
 
@@ -33,10 +35,17 @@ export XDG_CACHE_HOME="$HOME/.cache"
 mkdir ocp
 cd /ocp/
 SSH_KEY_DATA=$( cat /root/.ssh/id_ed25519.pub )
-SSH_KEY=$(echo "${SSH_KEY_DATA}" | awk -F '"' '{print $1}')
-PULLSECRET=$(echo "${PULLSECRET_KEY}" | awk -F '"' '{print $1}' | base64 --decode )
-AWS_ACCESS_KEY=$(echo "${AWS_ACCESS_KEY_DATA}" | awk -F '"' '{print $1}' | base64 --decode )
-AWS_SECRET_ACCESSKEY=$(echo "${AWS_SECRET_ACCESSKEY_DATA}" | awk -F '"' '{print $1}' | base64 --decode )
+SSH_KEY=                            # provide .pub key here
+PULLSECRET=                         # paste pullsecret key
+AWS_ACCESS_KEY=                     # paste AWS_ACCESS_KEY
+AWS_SECRET_ACCESSKEY=               # AWS_SECRET_ACCESSKEY
+#---------------------------------------------------------------------------------------------------------------------
+#SSH_KEY=$(echo "${SSH_KEY_DATA}" | awk -F '"' '{print $1}')     # provide .pub key here
+#PULLSECRET=$(echo "${PULLSECRET_KEY}" | awk -F '"' '{print $1}' | base64 --decode )   # paste pullsecret key
+#AWS_ACCESS_KEY=$(echo "${AWS_ACCESS_KEY_DATA}" | awk -F '"' '{print $1}' | base64 --decode ) # paste AWS_ACCESS_KEY
+#AWS_SECRET_ACCESSKEY=$(echo "${AWS_SECRET_ACCESSKEY_DATA}" | awk -F '"' '{print $1}' | base64 --decode ) # AWS_SECRET_ACCESSKEY
+#----------------------------------------------------------------------------------------------------------------------------
+
 mkdir ~/.aws
 cat<< EOF > ~/.aws/credentials
 [default] 

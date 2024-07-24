@@ -15,8 +15,8 @@ MACHINE_NETWORK_CIDR=10.0.0.0/16
 SERVICE_NETWORK_CIDR=172.30.0.0/16
 #---------------------------------------------------------------------------------------------------------------
 #PULLSECRET_KEY=                                         # Convert and paste pullsecret key in base64 Format 
-AWS_ACCESS_KEY_DATA=QUtJQVFFSVAzS1lWWFdQQUlDN1M=                                   # Convert and paste AWS ACCESS  key in base64 Format
-AWS_SECRET_ACCESSKEY_DATA=Ni9vR0xEQ3VVWjMzaVAyc1EzNFVPY1Z5K2twUWRJVkQxUjBhNmQzTQ==                             # Convert and paste AWS SECRET  key in base64 Format 
+AWS_ACCESS_KEY_DATA=QUtJQVFFSVAzS1lWUURYRVZIWE8=                                   # Convert and paste AWS ACCESS  key in base64 Format
+AWS_SECRET_ACCESSKEY_DATA=RFlJaXV5bW82V2Q5eEw3SmJCR0QzVm9WZGxycDJZeUN2dXh5WTRLOA==                             # Convert and paste AWS SECRET  key in base64 Format 
 #---------------------------------------------------------------------------------------------------------------
 
 #OpenShift Deployment Configuration 

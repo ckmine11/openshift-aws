@@ -1,6 +1,6 @@
 variable "access_key" {
         description = "Access key to AWS console"
-        default = "AKIA47CRVBT23UFIACCH"
+        default = "AKIAQEIP3KYVYYHOLUX4"
 }
 variable "secret_key" {
         description = "Secret key to AWS console"
@@ -13,12 +13,12 @@ variable "instance_type" {
 
 variable "subnet_id" {
         description = "The VPC subnet the instance(s) will be created in"
-        default = "subnet-002e0b47e6a9ee2e6"
+        default = "subnet-064c738d15b5e3da1"
 }
 
 variable "ami_id" {
         description = "The AMI to use"
-        default = "ami-074d61a739422fd74"
+        default = "ami-04efd0e2184af8ae0"
 }
 
 variable "number_of_instances" {
@@ -28,6 +28,6 @@ variable "number_of_instances" {
 
 
 variable "ami_key_pair_name" {
-        default = "test_key"
+        default = "test-key"
 }
 

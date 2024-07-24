@@ -1,6 +1,6 @@
 variable "access_key" {
         description = "Access key to AWS console"
-        default = "AKIAQEIP3KYVYYHOLUX4"
+        default = "Enter AWS access_key"
 }
 variable "secret_key" {
         description = "Secret key to AWS console"

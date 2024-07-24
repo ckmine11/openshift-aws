@@ -25,9 +25,12 @@ ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 apt install curl unzip -y 
-curl "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-$OPENSHIFT_VERSION/openshift-install-linux.tar.gz" | tar xz -C /tmp
+cd /tmp
+wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-$OPENSHIFT_VERSION/openshift-install-linux.tar.gz"
+tar -xz -C /tmp -f /tmp/openshift-install-linux.tar.gz
 mv /tmp/openshift-install /usr/bin
-curl "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-$OPENSHIFT_VERSION/openshift-client-linux.tar.gz" | tar xz -C /tmp
+wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-$OPENSHIFT_VERSION/openshift-client-linux.tar.gz"
+tar -xz -C /tmp -f /tmp/openshift-client-linux.tar.gz
 mv /tmp/oc /usr/bin
 mv /tmp/kubectl /usr/bin
 mkdir -p $HOME/.cache

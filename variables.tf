@@ -1,6 +1,6 @@
 variable "access_key" {
         description = "Access key to AWS console"
-        default = "Enter AWS access_key"
+        default = "AKIA47CRVBT23UFIACCH"
 }
 variable "secret_key" {
         description = "Secret key to AWS console"
@@ -18,7 +18,7 @@ variable "subnet_id" {
 
 variable "ami_id" {
         description = "The AMI to use"
-        default = "ami-068e0f1a600cd311c"
+        default = "ami-074d61a739422fd74"
 }
 
 variable "number_of_instances" {

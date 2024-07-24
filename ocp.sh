@@ -49,7 +49,7 @@ AWS_SECRET_ACCESSKEY=al4G2wu/m4ys1MAchKTomQrAhWmT9SpJMomoJL6V       # AWS_SECRET
 mkdir ~/.aws
 cat<< EOF > ~/.aws/credentials
 [default] 
-aws_access_key_id= $AWS_ACCESS_KEY
+aws_access_key_id=AKIAQEIP3KYVYYHOLUX4
 aws_secret_access_key=$AWS_SECRET_ACCESSKEY
 EOF
 

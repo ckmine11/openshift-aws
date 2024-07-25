@@ -33,7 +33,7 @@ wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-$O
 tar -xz -C /tmp -f /tmp/openshift-client-linux.tar.gz
 mv /tmp/oc /usr/bin
 mv /tmp/kubectl /usr/bin
-cd
+cd /
 mkdir -p $HOME/.cache
 export XDG_CACHE_HOME="$HOME/.cache"
 mkdir ocp
